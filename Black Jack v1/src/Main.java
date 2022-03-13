@@ -18,6 +18,8 @@ public class Main {
         int [] cards = {0, 1, 2, 3};//, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}; // create arrays of cards
         int min = 0;
         int max = 3;
+        int convertToFace = 0;
+        int arraySelectCard = 0;
 
         // Set up the beginning of the game. Display rules
         System.out.println("Welcome to Black Jack!");
@@ -30,45 +32,48 @@ public class Main {
         System.out.println("If you get an ace, it will either count as 11 or 1, whichever is better for you.");
 
         // draw two cards for the user. THESE STILL NEED TO BE STORE IN VARIABLES FOR FUTURE USE
-        playerCards.add(drawCard(drawnCards, cards, min, max));
-        playerCards.add(drawCard(drawnCards, cards, min, max));
+        playerCards.add(drawCard(drawnCards, cards, min, max, convertToFace, arraySelectCard));
+        convertToFace = playerCards.get(0);
+        createFace(convertToFace);
+        playerCards.add(drawCard(drawnCards, cards, min, max, convertToFace, arraySelectCard));
+        convertToFace = playerCards.get(1);
+        createFace(convertToFace);
         System.out.println(playerCards); //debug collecting card numbers/values to sum cards for score
         /*
             CARDS WILL NEED TO BE SUMMED HERE AFTER CONVERTED TO FACE
          */
 
         // draw two cards for the dealer, only display one. THESE STILL NEED TO BE STORE IN VARIABLES FOR FUTURE USE
-        dealerCards.add(drawCard(drawnCards, cards, min, max));
-        dealerCards.add(drawCard(drawnCards, cards, min, max));
-        System.out.println("The dealer has a score of "+dealerCards.get(0) +" with another card still hidden");
+        dealerCards.add(drawCard(drawnCards, cards, min, max, convertToFace, arraySelectCard));
+        convertToFace = dealerCards.get(0);
+        createFace(convertToFace);
+        dealerCards.add(drawCard(drawnCards, cards, min, max, convertToFace, arraySelectCard));
+        convertToFace = dealerCards.get(1);
+        createFace(convertToFace);
         System.out.println(dealerCards); //debug collecting dealer card numbers/values to sum for score
 
         }
+
         /*the draw card method will be called anytime a new card should be added to the game. it will be a
         self-contained way to generate a random number from 1-51, check if that number has been drawn, re-draw
         if it has, and convert that number to a face card. it will then return the face card.
          */
-        public static int drawCard(List<Integer> drawnCards, int [] cards, int min, int max) {
-            int convertToFace = 0;
+        public static int drawCard(List<Integer> drawnCards, int [] cards, int min, int max, int convertToFace, int arraySelectCard) {
             int reDraw = 0;
-            int arraySelectCard = cards[(int)Math.floor(Math.random()*(max-min+1)+min)];
+            arraySelectCard = cards[(int)Math.floor(Math.random()*(max-min+1)+min)];
             // check if current random card has already been drawn. re-draw if yes
             if (drawnCards.contains(arraySelectCard)) {
                 System.out.println("This happened"); //test line to debug dupes
-                reDraw = drawCard(drawnCards, cards, min, max);
+                reDraw = drawCard(drawnCards, cards, min, max, convertToFace, arraySelectCard);
             }
             else {
                 drawnCards.add(arraySelectCard); // add current selected card to drawnCards List to prevent drawing again
                // System.out.println("Drawn cards are " + drawnCards); //test line to debug dupes
-                convertToFace = arraySelectCard;
-                createFace(convertToFace);
                 return arraySelectCard;//return validated card for display to user
-
             }
-
             return reDraw;
-
         }
+
         public static Integer createFace(int convertToFace) {
             String nameOfCard = "";
             int valueOfCard = 0;
@@ -281,7 +286,7 @@ public class Main {
                 nameOfCard = "King of Spades";
                 valueOfCard = 10;
             }
-            roundTotal = roundTotal +valueOfCard;
+            roundTotal = roundTotal + valueOfCard;
             System.out.println("The card is " + nameOfCard);
             System.out.println(roundTotal);
 
