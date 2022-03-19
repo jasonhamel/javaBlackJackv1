@@ -18,12 +18,12 @@ public class Main {
         List<Integer> playerValue = new ArrayList<>();
         List<Integer> dealerValue = new ArrayList<>();
         int playerScore = 0;
-        int dealerScore = 0;
+        int dealerScore;
         int[] cards = {0, 1, 2, 3};//, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}; // create arrays of cards
         int min = 0;
         int max = 3;
         int convertToFace;
-        String hitOrStay = "";
+        String hitOrStay;
 
         // Set up the beginning of the game. Display rules
         System.out.println("Welcome to Black Jack!");
@@ -63,9 +63,11 @@ public class Main {
         System.out.println(""); //for formatting
         System.out.println("Would you like to risk another card? y/n");
         hitOrStay = myObj.nextLine();
-        if (hitOrStay == "y") {
+        if (hitOrStay.equals("y")) {
+            System.out.println("You've selected yes");
             //get unique card, add to total, print total, loop hitOrStay until answer is n
-        }else if (hitOrStay == "n") {
+        }else if (hitOrStay.equals("n")) {
+            System.out.println("You've selected no");
             //show final score to user and move to dealer drawing cards
         }else {
             //please select valid input CODE NEEDS TO BE ADJUSTED TO PROMPT AGAIN AND AGAIN UNTIL VALID INPUT
