@@ -19,11 +19,12 @@ public class Main {
         List<Integer> dealerValue = new ArrayList<>();
         int playerScore = 0;
         int dealerScore;
-        int[] cards = {0, 1, 2, 3};//, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}; // create arrays of cards
+        int[] cards = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}; // create arrays of cards
         int min = 0;
-        int max = 3;
+        int max = 51;
         int convertToFace;
-        String hitOrStay;
+        String hitOrStay = "y";
+        int dealerSecondCardDontShow = 1;
 
         // Set up the beginning of the game. Display rules
         System.out.println("Welcome to Black Jack!");
@@ -35,11 +36,11 @@ public class Main {
         System.out.println("The closest without going over wins!");
         System.out.println("If you get an ace, it will either count as 11 or 1, whichever is better for you.");
 
-        // draw two cards for the user. THESE STILL NEED TO BE STORE IN VARIABLES FOR FUTURE USE
+        // draw two cards for the user.
         for (int i = 0; i < 2; i++) {
             playerCards.add(drawCard(drawnCards, cards, min, max));
             convertToFace = playerCards.get(i);
-            playerValue.add(createFace(convertToFace));
+            playerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
             playerScore = playerScore + playerValue.get(i);
         }
 
@@ -50,28 +51,83 @@ public class Main {
         // draw one card to display to user
         dealerCards.add(drawCard(drawnCards, cards, min, max));
         convertToFace = dealerCards.get(0);
-        dealerValue.add(createFace(convertToFace));
+        dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
         dealerScore = dealerValue.get(0);
 
         //draw another to hide from user
         System.out.println("The dealer's score is: " + dealerScore);
         dealerCards.add(drawCard(drawnCards, cards, min, max));
         convertToFace = dealerCards.get(1);
-        dealerValue.add(createFace(convertToFace));
+        dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
         dealerScore = dealerScore + dealerValue.get(1);
 
         System.out.println(""); //for formatting
-        System.out.println("Would you like to risk another card? y/n");
-        hitOrStay = myObj.nextLine();
-        if (hitOrStay.equals("y")) {
-            System.out.println("You've selected yes");
-            //get unique card, add to total, print total, loop hitOrStay until answer is n
-        }else if (hitOrStay.equals("n")) {
-            System.out.println("You've selected no");
-            //show final score to user and move to dealer drawing cards
-        }else {
-            //please select valid input CODE NEEDS TO BE ADJUSTED TO PROMPT AGAIN AND AGAIN UNTIL VALID INPUT
+
+        //Offers user the chance to select another card and add it to their total
+        while (hitOrStay.equals("y") || !hitOrStay.equals("n")) {
+            System.out.println("Would you like to risk another card? y/n");
+            hitOrStay = myObj.nextLine();
+            if (hitOrStay.equals("y")) {
+
+                System.out.println("You've selected yes");
+                playerCards.add(drawCard(drawnCards, cards, min, max));
+                convertToFace = playerCards.get(playerCards.size() - 1);
+                playerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+                playerScore = playerScore + playerValue.get(playerCards.size() - 1);
+                System.out.println("Your score is: " + playerScore);
+                System.out.println(""); //formatting
+                if (playerScore > 21) {
+
+                    if (playerValue.contains(11)) {
+                        int replaceAceValue;
+                        replaceAceValue = playerValue.indexOf(11);
+                        playerValue.set(replaceAceValue, 1);
+                        playerScore = playerScore - 10;
+                        System.out.println("You went over 21, BUT you had an Ace. Your Ace was flipped to a score of 1");
+                        System.out.println("You're updated score is " + playerScore);
+                        if (playerScore > 21) {
+                            System.out.println("Still a bust though");
+                        }
+                    } else {
+                        System.out.println("That's a bust friendo");
+                        break;
+                    }
+                }
+            } else if (hitOrStay.equals("n")) {
+                System.out.println("You've selected no");
+                System.out.println("You're staying at " + playerScore + ". Now it's the dealer's turn");
+            } else {
+                System.out.println("Invalid selection. Please press the 'y' key for yes, or the 'n' key for no :)");
+            }
         }
+        if (dealerScore == playerScore){
+            System.out.print("The dealer also had" + playerScore + " and a tie goes to them. You Lose :(");
+        }
+        while (dealerScore < playerScore) {
+            dealerCards.add(drawCard(drawnCards, cards, min, max));
+            convertToFace = dealerCards.get(dealerCards.size() - 1);
+            dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+            dealerScore = dealerScore + dealerValue.get(dealerCards.size() - 1);
+            System.out.print("The dealer's score is now " + dealerScore);
+            if (dealerScore > 21) {
+
+                if (dealerValue.contains(11)) {
+                    int replaceAceValue;
+                    replaceAceValue = dealerValue.indexOf(11);
+                    dealerValue.set(replaceAceValue, 1);
+                    dealerScore = dealerScore - 10;
+                    System.out.println("The dealer over 21, BUT they had an Ace. Their Ace was flipped to a score of 1");
+                    System.out.println("They're updated score is " + dealerScore);
+                    if (dealerScore > 21) {
+                        System.out.println("Still a bust though. YOU WIN");
+                    }
+                } else {
+                    System.out.println("That's a bust friendo. YOU WIN");
+                    break;
+                }
+            }
+        }
+
     }
 
     /*the draw card method will be called anytime a new card should be added to the game. it will be a
@@ -93,8 +149,9 @@ public class Main {
         return reDraw;
     }
 
-    public static Integer createFace(int convertToFace) {
+    public static Integer createFace(int convertToFace, int dealerSecondCardDontShow) {
         String nameOfCard = "";
+        dealerSecondCardDontShow = dealerSecondCardDontShow + 1;
         int valueOfCard = 0;
         if (convertToFace == 0) {
             nameOfCard = "Ace of Hearts";
@@ -254,10 +311,12 @@ public class Main {
             valueOfCard = 10;
         }
 
+
         System.out.println("The card is " + nameOfCard);
 
-
         return valueOfCard;
+
+
     }
 
 }
