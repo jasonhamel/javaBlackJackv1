@@ -1,30 +1,50 @@
+/*
+    Version 1 of a text based Black Jack game. The purpose of this was to get familiar with Java and to also
+    prove I still remember basic concepts. Using a card constructor would have made this just an insane amount easier
+    and less gross to look at... but I didn't want to look up how to use them. That felt like dangerously close to
+    just looking up for to make a deck of cards, or how to make a Black Jack game. And that wasn't the point of
+    this project.
+
+    Happy with how most of this turned out. The absolute crapfest that is my if statements starting at line 183,
+    and my non-use of a method to initiate the drawing of a card are the biggest issues. I'd like to revisit this
+    project at some point and improve those, as well as add a constructor for cards. Maybe one day :)
+*/
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
 public class Main {
 
-
     public static void main(String[] args) {
-        // set Scanner to myObj
+        //Set Scanner to myObj
         Scanner myObj = new Scanner(System.in);
-        //create a list to store drawn cards in
+        //Create a list to store drawn cards in. This is used to ensure once a card is drawn, it cannot be redrawn.
         List<Integer> drawnCards = new ArrayList<>();
-        //create a list to store player score
+        //Create a list to store player's cards. This is used to hold which cards the user has, does not track score.
         List<Integer> playerCards = new ArrayList<>();
-        //create a list to store dealer score
+        //Create a list to store dealer score. This is used to hold which cards the dealer has, does not track score.
         List<Integer> dealerCards = new ArrayList<>();
+        //Create a list to store the numerical value of the user's cards. Summing the items gives the user's score.
         List<Integer> playerValue = new ArrayList<>();
+        //Create a list to store the numerical value of the dealer's cards. Summing the items gives the dealer's score.
         List<Integer> dealerValue = new ArrayList<>();
+        //Holds the player's score.
         int playerScore = 0;
+        //Holds the dealer's score.
         int dealerScore;
+        //Represents the cards in the deck. Passed into the method drawCard to choose a random number.
         int[] cards = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51}; // create arrays of cards
+        //Floor for random card selection.
         int min = 0;
+        //Ceiling for random card selection.
         int max = 51;
+        //Holds the value of the current drawn card. This gets passed into the method CreateFace to assign the random number to a card.
         int convertToFace;
+        //Captures user's choice on whether to take another card. Set to y as default to correctly prompt the user the first time.
         String hitOrStay = "y";
-        int dealerSecondCardDontShow = 1;
+        //Literally just keeps track of total number of cards drawn and prevents the displaying of the 4th card (the dealer's hidden card).
+        int dealerSecondCardHide = 0;
 
         // Set up the beginning of the game. Display rules
         System.out.println("Welcome to Black Jack!");
@@ -40,44 +60,44 @@ public class Main {
         for (int i = 0; i < 2; i++) {
             playerCards.add(drawCard(drawnCards, cards, min, max));
             convertToFace = playerCards.get(i);
-            playerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+            playerValue.add(createFace(convertToFace, dealerSecondCardHide));
             playerScore = playerScore + playerValue.get(i);
+            dealerSecondCardHide++;
         }
 
         //print user score
         System.out.println("Your score is: " + playerScore);
 
-
-        // draw one card to display to user
+        // draw the dealer's first card and display to player
         dealerCards.add(drawCard(drawnCards, cards, min, max));
         convertToFace = dealerCards.get(0);
-        dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+        dealerValue.add(createFace(convertToFace, dealerSecondCardHide));
         dealerScore = dealerValue.get(0);
+        dealerSecondCardHide++;
 
-        //draw another to hide from user
+        //draw the dealer's second card and hide from user
         System.out.println("The dealer's score is: " + dealerScore);
         dealerCards.add(drawCard(drawnCards, cards, min, max));
         convertToFace = dealerCards.get(1);
-        dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+        dealerValue.add(createFace(convertToFace, dealerSecondCardHide));
         dealerScore = dealerScore + dealerValue.get(1);
-
-        System.out.println(""); //for formatting
+        dealerSecondCardHide++;
 
         //Offers user the chance to select another card and add it to their total
         while (hitOrStay.equals("y") || !hitOrStay.equals("n")) {
             System.out.println("Would you like to risk another card? y/n");
             hitOrStay = myObj.nextLine();
             if (hitOrStay.equals("y")) {
-
                 System.out.println("You've selected yes");
+                //Draws another card, adds it to the score.
                 playerCards.add(drawCard(drawnCards, cards, min, max));
                 convertToFace = playerCards.get(playerCards.size() - 1);
-                playerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+                playerValue.add(createFace(convertToFace, dealerSecondCardHide));
                 playerScore = playerScore + playerValue.get(playerCards.size() - 1);
                 System.out.println("Your score is: " + playerScore);
-                System.out.println(""); //formatting
+                //Checks if the user has gone over 21
                 if (playerScore > 21) {
-
+                    //Checks if the user has an ace and reduces its value to 1 instead of 11
                     if (playerValue.contains(11)) {
                         int replaceAceValue;
                         replaceAceValue = playerValue.indexOf(11);
@@ -100,13 +120,20 @@ public class Main {
                 System.out.println("Invalid selection. Please press the 'y' key for yes, or the 'n' key for no :)");
             }
         }
-        if (dealerScore == playerScore){
+
+        //Checks if the dealer has a tying score. Which ends the game without the dealer risking a bust
+        if (dealerScore == playerScore) {
             System.out.print("The dealer also had" + playerScore + " and a tie goes to them. You Lose :(");
+        } else if (dealerScore > playerScore){
+            System.out.println("The dealer flipped their second card. You should have hit. They had " + dealerScore);
         }
-        while (dealerScore < playerScore) {
+
+        //Draws cards for the dealer until they either win or bust
+        while (dealerScore < playerScore && playerScore < 22) {
+            System.out.println("The dealer reveals their second card, bringing them to a score of " + dealerScore);
             dealerCards.add(drawCard(drawnCards, cards, min, max));
             convertToFace = dealerCards.get(dealerCards.size() - 1);
-            dealerValue.add(createFace(convertToFace, dealerSecondCardDontShow));
+            dealerValue.add(createFace(convertToFace, dealerSecondCardHide));
             dealerScore = dealerScore + dealerValue.get(dealerCards.size() - 1);
             System.out.print("The dealer's score is now " + dealerScore);
             if (dealerScore > 21) {
@@ -126,13 +153,17 @@ public class Main {
                     break;
                 }
             }
+            if (dealerScore <= 21 && dealerScore >= playerScore) {
+                System.out.println("The dealer fucked all your shit up. Your " + playerScore + " was no match for their " + dealerScore + ".");
+            }
         }
 
     }
 
-    /*the draw card method will be called anytime a new card should be added to the game. it will be a
+    /*the draw card method will be called anytime a new card should be added to the game. It will be a
     self-contained way to generate a random number from 1-51, check if that number has been drawn, re-draw
-    if it has, and convert that number to a face card. it will then return the face card.
+    if it has, and return that value. The value will then be passed into the createFace method to assign an
+    actual value and name.
      */
     public static int drawCard(List<Integer> drawnCards, int[] cards, int min, int max) {
         int reDraw;
@@ -149,9 +180,10 @@ public class Main {
         return reDraw;
     }
 
-    public static Integer createFace(int convertToFace, int dealerSecondCardDontShow) {
+    //ugh. I hate this code. Takes in the random number generated from drawCard and assigns it a value and title
+    public static Integer createFace(int convertToFace, int dealerSecondCardHide) {
+
         String nameOfCard = "";
-        dealerSecondCardDontShow = dealerSecondCardDontShow + 1;
         int valueOfCard = 0;
         if (convertToFace == 0) {
             nameOfCard = "Ace of Hearts";
@@ -310,9 +342,12 @@ public class Main {
             nameOfCard = "King of Spades";
             valueOfCard = 10;
         }
+        //checks if this is the dealer's hidden card. if it is, doesn't display it
+        if (dealerSecondCardHide != 3) {
+            System.out.println("The card is " + nameOfCard);
+            return valueOfCard;
+        }
 
-
-        System.out.println("The card is " + nameOfCard);
 
         return valueOfCard;
 
@@ -320,13 +355,5 @@ public class Main {
     }
 
 }
-
-
-// offer user the option to hit or stay
-// draw a single card for user each time they select hit
-// sum user's cards, check if they've gone over, if yes, check if there's an ace, if yes convert to a 1
-// check if user has exactly 21, switch to dealer
-// have dealer auto-draw cards until they exceed user score. if dealer goes over 21 they lose
-// offer to play again
 
 
